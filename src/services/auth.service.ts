@@ -2,12 +2,15 @@ import { Injectable } from "@angular/core";
 import { CredenciaisDTO } from "../models/credenciais.dto";
 import { HttpClient } from "@angular/common/http";
 import { API_CONFIG } from "../config/api.config";
+import { LocalUser } from "../models/local_user";
+import { StorageService } from "./storage.service";
 
 
 @Injectable()
 export class AuthService {
 
-    constructor(public http: HttpClient){
+    constructor(public http: HttpClient,
+                public storageService: StorageService){
     }
 
     authenticate(creds: CredenciaisDTO){
@@ -18,5 +21,18 @@ export class AuthService {
                 observe: 'response',
                 responseType: 'text' // O Angular tenta fazer um parse no JSON, então para evitar que o mesmo faça isso é passado no header quer a resposta é apenas texto.
             });
+    }
+
+    successfulLogin(authorizationValue: string){
+        let tok = authorizationValue.substring(7);
+        let user: LocalUser = {
+            token: tok
+        };
+
+        this.storageService.setLocalUser(user);
+    }
+
+    logout(){
+        this.storageService.setLocalUser(null);
     }
 }
