@@ -21,7 +21,7 @@ export class CategoriasPage {
     public categoriaService: CategoriaService) {
   }
 
-  ionViewDidLoad() {
+  ionViewDidLoad() {  
     this.categoriaService.findAll()
       .subscribe(response => {
         this.items = response;
