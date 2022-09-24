@@ -5,6 +5,7 @@ import { ClienteDTO } from '../../models/cliente.dto';
 import { ClienteService } from '../../services/domain/cliente.service';
 import { StorageService } from '../../services/storage.service';
 import { Camera, CameraOptions } from '@ionic-native/camera';
+import { ImageUtilService } from '../../services/image-util.service';
 
 @IonicPage()
 @Component({
@@ -14,17 +15,23 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 export class ProfilePage {
 
   cliente: ClienteDTO;
-  picture: string;
+  pictureCamera: string;
+  pictureLoaded: string;
   cameraOn: boolean = false;
 
   constructor(public navCtrl: NavController, 
               public navParams: NavParams,
               public storage: StorageService,
               public clienteService: ClienteService,
-              public camera: Camera) {
+              public camera: Camera,
+              public imgUtil: ImageUtilService) {
   }
 
   ionViewDidLoad() {
+    this.loadData();
+  }
+
+  loadData(){
     let localUser = this.storage.getLocalUser();
     if(localUser && localUser.email) {
       this.clienteService.findByEmail(localUser.email)
@@ -50,6 +57,18 @@ export class ProfilePage {
         error => {});
   }
 
+  openInputPicture() {
+    const input = document.getElementById('my_file');
+    input.click();
+  }
+
+  onChangeInputPicture(event){
+    this.imgUtil.dataBlobToBase64(event.target.files[0])
+      .then((data: string) => {
+        this.pictureLoaded = data;
+      });
+  }
+
   getCameraPicture() {
     this.cameraOn = true;
 
@@ -62,8 +81,26 @@ export class ProfilePage {
 
     this.camera.getPicture(options)
         .then((imageData) => {
-          this.picture = 'data:image/png;base64,' + imageData;
+          this.pictureCamera = 'data:image/png;base64,' + imageData;
           this.cameraOn = false;
         }, (error) => {});
+  }
+
+  sendPicture() {
+
+    let picture = this.pictureCamera || this.pictureLoaded;
+
+    this.clienteService.uploadPicture(picture)
+      .subscribe((response) => {
+        this.pictureCamera = null;
+        this.pictureLoaded = null;
+        this.loadData();
+      },
+      error => {});
+  }
+
+  cancel() {
+    this.pictureCamera = null;
+    this.pictureLoaded = null;
   }
 }

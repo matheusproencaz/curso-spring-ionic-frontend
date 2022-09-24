@@ -16,13 +16,21 @@
 
   <ion-card>
     <ion-card-header>
-      Enviar imagem de perfil
+      <p>Enviar imagem de perfil</p>
     </ion-card-header>
-    <ion-item *ngIf="picture">
-      <img [src]="picture"/>
+    <ion-item *ngIf="pictureCamera || pictureLoaded">
+      <img [src]="pictureCamera || pictureLoaded"/>
     </ion-item>
     <ion-item>
-      <button ion-button block (click)="getCameraPicture()" [disabled]="cameraOn">Camera</button>
+      <div class="btns">
+        <button class="btn" ion-button (click)="getCameraPicture()" [disabled]="cameraOn">Tirar Foto</button>
+        &nbsp;ou&nbsp;
+        <button class="btn" ion-button (click)="openInputPicture()">Carregar Foto</button>
+        <input type="file" accept="image/png, image/jpeg" ion-input id="my_file" (change)="onChangeInputPicture($event)">
+      </div>
+
+      <button *ngIf="pictureCamera || pictureLoaded" ion-button block outline (click)="sendPicture()">Enviar imagem</button>
+      <button *ngIf="pictureCamera || pictureLoaded" color="danger" ion-button block (click)="cancel()">Cancelar</button>
     </ion-item>
   </ion-card>
 

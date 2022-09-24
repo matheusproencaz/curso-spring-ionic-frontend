@@ -80,5 +80,4 @@ export class ProdutosPage {
       infiniteScroll.complete();
     }, 1000);
   }
-
 }
