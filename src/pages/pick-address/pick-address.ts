@@ -32,7 +32,6 @@ export class PickAddressPage {
       this.clienteService.findByEmail(localUser.email)
         .subscribe(response => {
           this.itens = response['enderecos'];
-          console.log(response)
           let cart = this.cartService.getCart();
 
           this.pedido = {
